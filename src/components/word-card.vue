@@ -15,10 +15,10 @@
   <div class="word-card col-md-4" v-for="(word,key) in vocabulary"  :key="key">
     <div id="card">
                     <!-- my word -->
-       <ul class="word row">
+       <ul class="word row" :class="key">
          <li class="edit col-md-12">
           <button @click="removeWord(key)"> <i class="fas fa-trash-alt"></i> </button>
-          <button @click='setEditWord()' ref='edit'> <i class="fas fa-edit"></i> </button>
+          <button @click='setEditWord(word,key)' ref='edit'> <i class="fas fa-edit"></i> </button>
         </li>
          <li class="col-md-6"><span class="EN"> {{word.wordInEnglish}} </span>&#40;<span class="POS">{{word.partsOfSpeech}}</span>&#41;</li>
          <li class="col-md-6 AR"> {{word.wordInArabic}} </li>
@@ -26,16 +26,20 @@
          </ul>
        </div>
                 <!-- Edit my word -->
-         <ul class="editWord row">
+         <ul class="editWord row" :class="key">
            <li class="col-md-12">
              <button type="button" class="form-control" @click="cancelEdit(key)"> X </button>
            </li>
-           <li class="col-md-12"><input type="text" class="form-control" v-model="newWordInEnglish[key]" :placeholder="word.wordInEnglish"></li>
-           <li class="col-md-12"><input type="text" class="form-control" v-model="newPartsOfSpeech[key]" :placeholder="word.partsOfSpeech"></li>
-           <li class="col-md-12"><input type="text" class="form-control" v-model="newWordInArabic[key]" :placeholder="word.wordInArabic"></li>
-          <li class="col-md-12"><input type="text" class="form-control" v-model="newSentence[key]" :placeholder="word.sentence"></li>
+           <!-- <li class="col-md-12"><input type="text" class="form-control" v-model="newWordInEnglish[key]" :placeholder="word.wordInEnglish"></li> -->
+           <li class="col-md-12"><input type="text" class="form-control" v-model="word.wordInEnglish"></li>
+           <!-- <li class="col-md-12"><input type="text" class="form-control" v-model="newPartsOfSpeech[key]" :placeholder="word.partsOfSpeech"></li> -->
+           <li class="col-md-12"><input type="text" class="form-control" v-model="word.partsOfSpeech"></li>
+           <!-- <li class="col-md-12"><input type="text" class="form-control" v-model="newWordInArabic[key]" :placeholder="word.wordInArabic"></li> -->
+           <li class="col-md-12"><input type="text" class="form-control" v-model="word.wordInArabic"></li>
+          <!-- <li class="col-md-12"><input type="text" class="form-control" v-model="newSentence[key]" :placeholder="word.sentence"></li> -->
+          <li class="col-md-12"><input type="text" class="form-control" v-model="word.sentence" ></li>
            <li class="col-md-12">
-             <input type="button" class="btn btn-light" value="Save" @click="saveEdit(key)">
+             <input type="button" class="btn btn-light" value="Save" @click="saveEdit(word)">
            </li>
            </ul>
      </div>
@@ -55,7 +59,16 @@ export default{
     newWordInEnglish : [],
     newPartsOfSpeech : [] ,
     newWordInArabic : [],
-    newSentence :[]
+    newSentence :[],
+    //object that holds varibles for the inputs
+    words:{
+      wordInEnglish:'',
+      partsOfSpeech:'',
+      wordInArabic:'',
+      sentence:''
+
+
+    }
     }
 },
   firebase : {
@@ -69,25 +82,32 @@ export default{
     removeWord : function(key){
       wordRef.child(key).remove()
     },
-   setEditWord : function(){
-     $('.word').hide();
-     $('.editWord').show();
+   setEditWord : function(word,key){
+     $('ul.word.row.'+key).hide();
+     $('ul.editWord.row.' + key).show();
+    //  console.log(word)
+    //  this.words.wordInEnglish=word.wordInEnglish;
+    //  this.words.wordInArabic=word.wordInArabic;
+    //  this.words.partsOfSpeech=word.partsOfSpeech;
+    //  this.words.sentence=word.sentence
+
 
   },
-    saveEdit : function(key){
+    saveEdit : function(word,key){
+       console.log(word)
       //db.ref('vocabulary/' + key)
       wordRef.child(key).set({
-        wordInEnglish : this.newWordInEnglish[key],
-        partsOfSpeech : this.newPartsOfSpeech[key],
-        newWordInArabic:this. newWordInArabic[key],
-        sentence : this.newSentence[key]
+        wordInEnglish : word.wordInEnglish,
+        partsOfSpeech : word.wordInArabic,
+        newWordInArabic:word.partsOfSpeech,
+        sentence : word.sentence
       });
-      $('.editWord').hide();
-      $('.word').show();
+      $('ul.word.row.'+key).show();
+      $('ul.editWord.row.' + key).hide();
     },
     cancelEdit : function(key){
-      $('.word').show();
-      $('.editWord').hide();
+      $('ul.word.row.'+key).show();
+      $('ul.editWord.row.' + key).hide();
     }
   },
   created(){
@@ -219,7 +239,4 @@ font-weight: bold;
   }
 
 }
-
-
-
 </style>
