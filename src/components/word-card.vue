@@ -9,7 +9,7 @@
     </div>
   </form>
 <div class="row">
-  <div class="word-card col-md-4" v-for="(word,key) in vocabulary"  :key="key">
+  <div class="word-card col-md-4" v-for="(word,key) in vocabulary | filterWords" :key="key">
     <div id="card">
                     <!-- my word -->
        <ul class="word row" :class="key">
@@ -57,19 +57,24 @@ export default{
     wordInEnglish : "",
     partsOfSpeech : "" ,
     wordInArabic : "",
-    sentence :""
+    sentence :"",
+    //filterWords: []
   }
 
     }
 },
   firebase : {
-      vocabulary: db.ref('vocabulary')
+      vocabulary: db.ref('vocabulary'),
+      //filterWords : vocabulary.orderByChild('wordInEnglish').equalTo(search)
   },
   methods:{
-    filterWords : function(){
+    filterWords : function(search){
       wordRef.orderByChild('wordInEnglish').equalTo(search);
-    },
 
+},
+/*wordRef.vocabulary = wordRef.vocabulary .filter(function (word) {
+return word.wordInEnglish.match(search)
+})*/
     removeWord : function(key){
       wordRef.child(key).remove()
     },
